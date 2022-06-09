@@ -1,5 +1,5 @@
-const points = Array.from({ length: 10 }).map(() => {
-	return { x: 500, y: 500};
+const points = Array.from({ length: 5 }).map(() => {
+	return { x: 500, y: 500 };
 });
 const lineLength = 50;
 
@@ -15,30 +15,15 @@ function _dist(x1, y1, x2, y2) {
 	return Math.sqrt(dx * dx + dy * dy);
 }
 
-
 function doFABRIKMagic() {
-	for (let l = 0; l < 100; l++) {
-		// From mouse to anchor
+	const origin = { x: 500, y: 500 };
+	const target = { x: mouseX, y: mouseY };
+	for (let iter = 0; iter < 100; iter++) {
+		const startingFromTarget = iter % 2 == 0;
+		points.reverse();
 
-		// set the last point equal to the mouse cursor
-		points[points.length - 1].x = mouseX;
-		points[points.length - 1].y = mouseY;
+		points[0] = startingFromTarget ? target : origin;
 
-		for (let i = points.length - 2; i >= 0; i--) {
-			// find direction and distance
-			const { x: cx, y: cy } = points[i];
-			const { x: px, y: py } = points[i + 1];
-			const distance = _dist(cx, cy, px, py);
-			const dx = px - cx;
-			const dy = py - cy;
-			const distRatio = lineLength / distance;
-			points[i].x += dx * (1 - distRatio);
-			points[i].y += dy * (1 - distRatio);
-
-			// move point
-		}
-
-		points[0] = { x: 500, y: 500, vy: 0 };
 		for (let i = 1; i < points.length; i++) {
 			// find direction and distance
 			const { x: cx, y: cy } = points[i];
@@ -49,9 +34,10 @@ function doFABRIKMagic() {
 			const distRatio = lineLength / distance;
 			points[i].x += dx * (1 - distRatio);
 			points[i].y += dy * (1 - distRatio);
-
-			// move point
 		}
+		const last = points[points.length - 1];
+		const distToTarget = _dist(last.x, last.y, target.x, target.y);
+		if (!startingFromTarget && distToTarget < 0.01) return;
 	}
 }
 
